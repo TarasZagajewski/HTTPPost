@@ -1,0 +1,8 @@
+name: HTTPPost
+version: 1.0
+author: Taras Zagajewski
+main: com.Taras.HTTPPost.HTTPPost
+api-version: 1.18
+commands:
+  SetLight:
+    description: Selects the light you want to use!
