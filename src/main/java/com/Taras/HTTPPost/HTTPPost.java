@@ -55,7 +55,7 @@ public class HTTPPost extends JavaPlugin implements Listener {
         try {
             URL url = new URL("http://192.168.0.17:3000/assistant");
             URLConnection con = url.openConnection();
-            HttpURLConnection http = (HttpURLConnection)con;
+            HttpURLConnection http = (HttpURLConnection) con;
             http.setRequestMethod("POST"); // PUT is another valid option
             http.setDoOutput(true);
 
@@ -65,11 +65,11 @@ public class HTTPPost extends JavaPlugin implements Listener {
             http.setFixedLengthStreamingMode(length);
             http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             http.connect();
-            try(OutputStream os = http.getOutputStream()) {
+            try (OutputStream os = http.getOutputStream()) {
                 os.write(out);
             }
             // Do something with http.getInputStream()
-        } catch(IOException e) {
+        } catch (IOException e) {
             getServer().getConsoleSender().sendMessage(ChatColor.RED + "HTTPPost: Error!");
         }
     }
@@ -78,7 +78,7 @@ public class HTTPPost extends JavaPlugin implements Listener {
         try {
             URL url = new URL("http://192.168.0.17:3000/assistant");
             URLConnection con = url.openConnection();
-            HttpURLConnection http = (HttpURLConnection)con;
+            HttpURLConnection http = (HttpURLConnection) con;
             http.setRequestMethod("POST"); // PUT is another valid option
             http.setDoOutput(true);
 
@@ -88,12 +88,11 @@ public class HTTPPost extends JavaPlugin implements Listener {
             http.setFixedLengthStreamingMode(length);
             http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             http.connect();
-            try(OutputStream os = http.getOutputStream()) {
+            try (OutputStream os = http.getOutputStream()) {
                 os.write(out);
             }
             // Do something with http.getInputStream()
-        }
-        catch(IOException e) {
+        } catch (IOException e) {
             getServer().getConsoleSender().sendMessage(ChatColor.RED + "HTTPPost: Error!");
         }
     }
@@ -102,7 +101,7 @@ public class HTTPPost extends JavaPlugin implements Listener {
         try {
             URL url = new URL("http://192.168.0.101:3000/assistant");
             URLConnection con = url.openConnection();
-            HttpURLConnection http = (HttpURLConnection)con;
+            HttpURLConnection http = (HttpURLConnection) con;
             http.setRequestMethod("POST"); // PUT is another valid option
             http.setDoOutput(true);
 
@@ -114,87 +113,37 @@ public class HTTPPost extends JavaPlugin implements Listener {
             http.setFixedLengthStreamingMode(length);
             http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             http.connect();
-            try(OutputStream os = http.getOutputStream()) {
+            try (OutputStream os = http.getOutputStream()) {
                 os.write(out);
             }
             // Do something with http.getInputStream()
-        }
-        catch(IOException e) {
+        } catch (IOException e) {
             getServer().getConsoleSender().sendMessage(ChatColor.RED + "HTTPPost: Error!");
         }
     }
 
-    public class StoreCommand implements CommandExecutor {
+        public class PlaceLeverListener implements Listener {
 
-        @Override
-        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
-            if (sender instanceof Player) {
-                Player p = (Player) sender;
-
-                if (args.length > 0) {
-
-                    StringBuilder Command = new StringBuilder();
-
-                    for (String arg : args) {
-                        Command.append(arg + "");
-                    }
-
-                    Block block = p.getTargetBlock(null, 200);
-
-                    PersistentDataContainer data = new CustomBlockData(block, plugin);
-
-                    if (data.has(new NamespacedKey(HTTPPost.getPlugin(), "Command"), PersistentDataType.STRING)) {
-                        p.sendMessage(ChatColor.GRAY + "There is already a command stored in this block!");
-                        p.sendMessage(ChatColor.GRAY + "Command: " + ChatColor.GREEN + data.get(new NamespacedKey(HTTPPost.getPlugin(), "Command"), PersistentDataType.STRING)); //Return current command
-                    } else {
-                        data.set(new NamespacedKey(HTTPPost.getPlugin(), "Command"), PersistentDataType.STRING, Command.toString());
-                        p.sendMessage(ChatColor.GREEN + "Command Stored!");
-                    }
-                }
-
-            }
-
-
-            return true;
-        }
-
-    }
-
-    public class LeverListener implements Listener {
-        @EventHandler
-        public void onPull(PlayerInteractEvent event) {
-            if(event.getClickedBlock().getType() == Material.LEVER){
-                Block block = event.getClickedBlock();
-                getServer().getConsoleSender().sendMessage(ChatColor.GOLD + block.getBlockData().getAsString());
-                Switch lever = (Switch) block.getBlockData();
-                if (!lever.isPowered()) {
-                    lightsOn();
-                    getServer().getConsoleSender().sendMessage(ChatColor.BLUE + "HTTPPost: Lights On!");
+            @EventHandler
+            public void onPlace(BlockPlaceEvent event) {
+                if (event.getBlock().getType() == Material.LEVER) {
+                    Player p = event.getPlayer();
+                    p.sendMessage("Lever Placed!");
                 } else {
-                    lightsOff();
-                    getServer().getConsoleSender().sendMessage(ChatColor.BLUE + "HTTPPost: Lights Off!");
+                    return;
                 }
             }
-        }
-    }
 
-    public class PlaceLeverListener implements Listener {
-
-        @EventHandler
-        public void onPlace(BlockPlaceEvent event) {
-            if (event.getBlock().getType() == Material.LEVER) {
-                Player p = event.getPlayer();
-                p.sendMessage("Lever Placed!");
-            } else {
-                return;
+            @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+            public void onLeverBreak(BlockBreakEvent event) {
+                if (event.getBlock().getType() != Material.LEVER) return; // Only do sth if the block was a lever
+                CustomBlockData cbd = new CustomBlockData(event.getBlock(), this);
+                cbd.clear();
             }
 
 
         }
+
+
     }
-
-
-
-
 }
