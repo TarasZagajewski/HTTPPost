@@ -29,6 +29,15 @@ import de.jeff_media.customblockdata.CustomBlockData;
 public class HTTPPost extends JavaPlugin implements Listener {
 
     private static HTTPPost plugin;
+    private static HTTPPost instance;
+
+    {
+        instance = this;
+    }
+
+    public static HTTPPost getInstance() {
+        return instance;
+    }
 
     @Override
     public void onEnable() {
@@ -123,78 +132,4 @@ public class HTTPPost extends JavaPlugin implements Listener {
             getServer().getConsoleSender().sendMessage(ChatColor.RED + "HTTPPost: Error!");
         }
     }
-
-    public class StoreCommand implements CommandExecutor {
-
-        @Override
-        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
-            if (sender instanceof Player) {
-                Player p = (Player) sender;
-
-                if (args.length > 0) {
-
-                    StringBuilder Command = new StringBuilder();
-
-                    for (String arg : args) {
-                        Command.append(arg + "");
-                    }
-
-                    Block block = p.getTargetBlock(null, 200);
-
-                    PersistentDataContainer data = new CustomBlockData(block, plugin);
-
-                    if (data.has(new NamespacedKey(HTTPPost.getPlugin(), "Command"), PersistentDataType.STRING)) {
-                        p.sendMessage(ChatColor.GRAY + "There is already a command stored in this block!");
-                        p.sendMessage(ChatColor.GRAY + "Command: " + ChatColor.GREEN + data.get(new NamespacedKey(HTTPPost.getPlugin(), "Command"), PersistentDataType.STRING)); //Return current command
-                    } else {
-                        data.set(new NamespacedKey(HTTPPost.getPlugin(), "Command"), PersistentDataType.STRING, Command.toString());
-                        p.sendMessage(ChatColor.GREEN + "Command Stored!");
-                    }
-                }
-
-            }
-
-
-            return true;
-        }
-
-    }
-
-    public class LeverListener implements Listener {
-        @EventHandler
-        public void onPull(PlayerInteractEvent event) {
-            if(event.getClickedBlock().getType() == Material.LEVER){
-                Block block = event.getClickedBlock();
-                getServer().getConsoleSender().sendMessage(ChatColor.GOLD + block.getBlockData().getAsString());
-                Switch lever = (Switch) block.getBlockData();
-                if (!lever.isPowered()) {
-                    lightsOn();
-                    getServer().getConsoleSender().sendMessage(ChatColor.BLUE + "HTTPPost: Lights On!");
-                } else {
-                    lightsOff();
-                    getServer().getConsoleSender().sendMessage(ChatColor.BLUE + "HTTPPost: Lights Off!");
-                }
-            }
-        }
-    }
-
-    public class PlaceLeverListener implements Listener {
-
-        @EventHandler
-        public void onPlace(BlockPlaceEvent event) {
-            if (event.getBlock().getType() == Material.LEVER) {
-                Player p = event.getPlayer();
-                p.sendMessage("Lever Placed!");
-            } else {
-                return;
-            }
-
-
-        }
-    }
-
-
-
-
 }
